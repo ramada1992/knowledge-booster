@@ -15,8 +15,18 @@
         <maven.compiler.target>${project.java.version}</maven.compiler.target>
         <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
 
+        <apache.poi.version>4.0.1</apache.poi.version>
+
         <plugin.shade.version>3.2.1</plugin.shade.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${apache.poi.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <pluginManagement>
