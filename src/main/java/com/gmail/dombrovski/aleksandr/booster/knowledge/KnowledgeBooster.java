@@ -5,14 +5,16 @@ import java.util.stream.*;
 
 public class KnowledgeBooster {
     public static void main(String[] argv) {
-        System.out.println("Please enter file list in the following format FileName;FileName;FileName");
-        Scanner input = new Scanner(System.in);
-        String fileName = input.nextLine();
-        String[] inputString;
-        String separator = ";";
-        inputString = fileName.split(separator);
-        Stream<String> stream = Arrays.stream(inputString);
-        stream.forEach(x -> System.out.println(GetMetaData.getMetaData(x)));
+
+        if(argv.length == 0){
+            System.out.println("No files");
+        } else {
+            String separator = ";";
+            String inputString = argv[0];
+            String[] inputString2 = inputString.split(separator);
+            Stream<String> stream = Arrays.stream(inputString2);
+            stream.forEach(x -> System.out.println(GetMetaData.getMetaData(x)));
+        }
 
     }
 }
