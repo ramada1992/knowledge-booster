@@ -9,7 +9,7 @@
     <properties>
         <project.encoding>UTF-8</project.encoding>
         <project.java.version>11</project.java.version>
-        <project.main.class>com.gmail.dombrovski.aleksandr.booster.knowledge.KnowledgeBooster</project.main.class>
+        <project.main.class>com.gmail.dombrovski.aleksandr.booster.knowledge.ExcelAuthorRemover</project.main.class>
 
         <maven.compiler.source>${project.java.version}</maven.compiler.source>
         <maven.compiler.target>${project.java.version}</maven.compiler.target>
