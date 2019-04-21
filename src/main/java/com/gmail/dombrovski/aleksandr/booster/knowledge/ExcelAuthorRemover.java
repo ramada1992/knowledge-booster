@@ -6,10 +6,10 @@ import java.util.stream.*;
 public class ExcelAuthorRemover {
     public static void main(String[] argv) {
             Stream<String> stream = Arrays.stream(argv);
-            stream.forEach(x -> System.out.println(getMetaData(x)));
+            stream.forEach(x -> System.out.println(removeAuthors(x)));
     }
 
-    private static String getMetaData(String x){
-        return x;
+    private static void removeAuthors(String fileName){
+
     }
 }
