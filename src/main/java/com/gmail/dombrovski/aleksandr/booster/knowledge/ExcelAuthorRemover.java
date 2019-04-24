@@ -15,28 +15,21 @@ import java.util.Arrays;
 
 
 public class ExcelAuthorRemover {
-    public static void main(String[] fileName) {
+    public static void main(final String[] fileName) {
         Arrays.stream(fileName).forEach(ExcelAuthorRemover::removeAuthors);
     }
 
-    private static void removeAuthors(String fileName) {
-        try {
+    private static void removeAuthors(final String fileName) {
+        try (FileInputStream stream = new FileInputStream("./src/main/xls/" + fileName)) {
 
-            FileInputStream stream = new FileInputStream("./src/main/xls/" + fileName);
-
-            POIFSFileSystem poifs = new POIFSFileSystem(stream);
-            DirectoryEntry dir = poifs.getRoot();
+            DirectoryEntry dir = new POIFSFileSystem(stream).getRoot();
             DocumentEntry siEntry = (DocumentEntry) dir.getEntry(SummaryInformation.DEFAULT_STREAM_NAME);
 
-            DocumentInputStream dis = new DocumentInputStream(siEntry);
+            PropertySet ps = new PropertySet(new DocumentInputStream(siEntry));
 
-            PropertySet ps = new PropertySet(dis);
-
-            SummaryInformation si = new SummaryInformation(ps);
-            String author = si.getAuthor();
+            String author = new SummaryInformation(ps).getAuthor();
 
             System.out.println(author);
-
         } catch (IOException | NoPropertySetStreamException | UnexpectedPropertySetTypeException ex) {
             ex.getStackTrace();
         }
