@@ -29,7 +29,7 @@ public class ExcelAuthorRemover {
             PropertySet ps = new PropertySet(new DocumentInputStream(siEntry));
             String author = new SummaryInformation(ps).getAuthor();
 
-            System.out.println(author);
+            System.out.println("File author " + author);
 
         } catch (IOException | NoPropertySetStreamException | UnexpectedPropertySetTypeException ex) {
             ex.getStackTrace();
