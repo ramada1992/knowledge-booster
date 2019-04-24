@@ -20,16 +20,17 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String fileName) {
-        try (FileInputStream stream = new FileInputStream("./src/main/xls/" + fileName)) {
+        try (FileInputStream stream = new FileInputStream("src/main/xls/" + fileName)) {
+
+            System.out.println("Remove authors name from " + fileName);
 
             DirectoryEntry dir = new POIFSFileSystem(stream).getRoot();
             DocumentEntry siEntry = (DocumentEntry) dir.getEntry(SummaryInformation.DEFAULT_STREAM_NAME);
-
             PropertySet ps = new PropertySet(new DocumentInputStream(siEntry));
-
             String author = new SummaryInformation(ps).getAuthor();
 
             System.out.println(author);
+
         } catch (IOException | NoPropertySetStreamException | UnexpectedPropertySetTypeException ex) {
             ex.getStackTrace();
         }
