@@ -1,14 +1,11 @@
 package com.gmail.dombrovski.aleksandr.booster.knowledge;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -19,42 +16,49 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String fileName) {
-        System.out.println("Remove author from file" + fileName);
+        System.out.println("Processing file " + fileName);
+        final File file = new File(fileName);
 
-        File inputFile = new File(fileName);
-
-
-        if(inputFile.exists()){
-            processXLS();
+        if (!file.exists()) {
+            System.err.println("File doesn't exist");
+            return;
         }
 
-    }
-
-    private static void processXLS(String fileName) {
-
-        try (final FileInputStream inputFileRead = new FileInputStream(fileName)) {
-            final HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(inputFileRead));
-            final SummaryInformation summaryInfo = workbook.getSummaryInformation();
-            final String author = summaryInfo.getAuthor();
-
-            if (author != null) {
-                System.out.println("Current author name " + author);
-
-                inputFileRead.close();
-                //summaryInfo.setAuthor("New");
-                final FileOutputStream outputFileWrite = new FileOutputStream(fileName);
-                workbook.write(outputFileWrite);
-                outputFileWrite.close();
-            }
-
-        } catch (IOException ex) {
-            ex.getStackTrace();
+        if (fileName.toLowerCase().endsWith(".xls")) {
+            processXLS(file);
+        } else {
+            System.err.println("Unsupported file type");
         }
-
     }
 
+    private static void processXLS(final File file) {
+        final HSSFWorkbook workbook = readXLS(file);
+        final SummaryInformation summaryInfo = workbook.getSummaryInformation();
+        final String author = summaryInfo.getAuthor();
+
+        if (author != null && !author.isBlank()) {
+            System.out.println("Cleaning author " + author);
+            summaryInfo.setAuthor("");
+
+            saveXLS(workbook, file);
+        } else {
+            System.out.println("Already clean");
+        }
+    }
+
+    private static HSSFWorkbook readXLS(final File file) {
+        try (FileInputStream input = new FileInputStream(file)) {
+            return new HSSFWorkbook(new POIFSFileSystem(input));
+        } catch (final IOException e) {
+            throw new RuntimeException("Cannot read file", e);
+        }
+    }
+
+    private static void saveXLS(final HSSFWorkbook workbook, final File file) {
+        try {
+            workbook.write(file);
+        } catch (final IOException e) {
+            throw new RuntimeException("Cannot save file", e);
+        }
+    }
 }
-
-
-
-

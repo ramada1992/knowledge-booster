@@ -3,3 +3,4 @@ files/
 target/
 *.iml
 .*
+*.xls*
