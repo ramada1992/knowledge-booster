@@ -5,6 +5,7 @@ import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,13 +21,13 @@ public class ExcelAuthorRemover {
     private static void removeAuthors(final String fileName) {
         System.out.println("Remove author from file" + fileName);
 
-        File file = new File(fileName);
+        File inputFile = new File(fileName);
 
-        if (FilenameUtils.getExtension(fileName).equals("xls")) {
-            System.out.println("Remove authors name from " + fileName);
 
-            processXLS(fileName);
+        if(inputFile.exists()){
+            processXLS();
         }
+
     }
 
     private static void processXLS(String fileName) {
