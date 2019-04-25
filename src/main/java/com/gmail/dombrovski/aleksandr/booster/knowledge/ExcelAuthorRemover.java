@@ -21,12 +21,11 @@ public class ExcelAuthorRemover {
 
         if (FilenameUtils.getExtension(inputFile).equals("xls")) {
             System.out.println("Remove authors name from " + fileName);
-            processXSL(inputFile);
+            processXLS(inputFile);
         }
-
     }
 
-    private static void processXSL(String fileName) {
+    private static void processXLS(String fileName) {
 
         try (final FileInputStream inputFileRead = new FileInputStream(fileName)) {
             final HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(inputFileRead));
