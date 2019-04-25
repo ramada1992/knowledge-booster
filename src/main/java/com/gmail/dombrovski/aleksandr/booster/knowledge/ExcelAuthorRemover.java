@@ -16,28 +16,30 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String fileName) {
-        final String inputFile = ("src/main/xls/" + fileName);
+        final String inputFile = ("files/" + fileName);
 
-        try (final FileInputStream inputFileRead = new FileInputStream(inputFile)) {
+        if (fileName.contains(".xls")) {
+            try (final FileInputStream inputFileRead = new FileInputStream(inputFile)) {
 
-            System.out.println("Remove authors name from " + fileName);
+                System.out.println("Remove authors name from " + fileName);
 
-            final HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(inputFileRead));
-            SummaryInformation summaryInfo = workbook.getSummaryInformation();
-            String author = summaryInfo.getAuthor();
+                final HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(inputFileRead));
+                final SummaryInformation summaryInfo = workbook.getSummaryInformation();
+                String author = summaryInfo.getAuthor();
 
-            if (author != null) {
-                System.out.println("Current author name " + author);
+                if (author != null) {
+                    System.out.println("Current author name " + author);
 
-                inputFileRead.close();
-                summaryInfo.setAuthor(null);
-                final FileOutputStream outputFileWrite = new FileOutputStream(inputFile);
-                workbook.write(outputFileWrite);
-                outputFileWrite.close();
+                    inputFileRead.close();
+                    summaryInfo.setAuthor(null);
+                    final FileOutputStream outputFileWrite = new FileOutputStream(inputFile);
+                    workbook.write(outputFileWrite);
+                    outputFileWrite.close();
+                }
+            } catch (IOException ex) {
+                ex.getStackTrace();
             }
-        } catch (IOException ex) {
-            ex.getStackTrace();
-        }
+        } else System.out.println("File type xlsx");
     }
 }
 
