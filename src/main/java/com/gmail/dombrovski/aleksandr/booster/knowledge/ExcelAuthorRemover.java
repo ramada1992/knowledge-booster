@@ -17,11 +17,10 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String fileName) {
-        final String inputFile = ("files/" + fileName);
 
-        if (FilenameUtils.getExtension(inputFile).equals("xls")) {
+        if (FilenameUtils.getExtension(fileName).equals("xls")) {
             System.out.println("Remove authors name from " + fileName);
-            processXLS(inputFile);
+            processXLS(fileName);
         }
     }
 
