@@ -46,7 +46,7 @@ public class ExcelAuthorRemover {
         } else {
             System.out.println("Author already clean");
         }
-        if (author != null && !lastAuthor.isBlank()) {
+        if (lastAuthor != null && !lastAuthor.isBlank()) {
             System.out.println("Cleaning last author " + lastAuthor);
             summaryInfo.setLastAuthor("");
 
