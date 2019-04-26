@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 
+
 public class ExcelAuthorRemover {
     public static void main(final String[] fileName) {
         Arrays.stream(fileName).forEach(ExcelAuthorRemover::removeAuthors);
@@ -20,7 +21,7 @@ public class ExcelAuthorRemover {
         final File file = new File(fileName);
 
         if (!file.exists()) {
-            System.err.println("File doesn't exist");
+            System.out.println("File doesn't exist");
             return;
         }
 
@@ -35,6 +36,7 @@ public class ExcelAuthorRemover {
         final HSSFWorkbook workbook = readXLS(file);
         final SummaryInformation summaryInfo = workbook.getSummaryInformation();
         final String author = summaryInfo.getAuthor();
+        final String lastAuthor = summaryInfo.getLastAuthor();
 
         if (author != null && !author.isBlank()) {
             System.out.println("Cleaning author " + author);
@@ -42,7 +44,15 @@ public class ExcelAuthorRemover {
 
             saveXLS(workbook, file);
         } else {
-            System.out.println("Already clean");
+            System.out.println("Author already clean");
+        }
+        if (author != null && !lastAuthor.isBlank()) {
+            System.out.println("Cleaning last author " + lastAuthor);
+            summaryInfo.setLastAuthor("");
+
+            saveXLS(workbook, file);
+        } else {
+            System.out.println("Last author already clean");
         }
     }
 
