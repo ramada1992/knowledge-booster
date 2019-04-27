@@ -31,7 +31,6 @@ public class ExcelAuthorRemover {
             System.err.println("Unsupported file type");
         }
     }
-
     //***       Start_Logic - Process XLS documents Microsoft Office 1997-2004        ***
 
     private static void processXLS(final File file) {
@@ -40,24 +39,24 @@ public class ExcelAuthorRemover {
         final String author = summaryInfo.getAuthor();
         final String lastAuthor = summaryInfo.getLastAuthor();
 
-        boolean authorIsNotBlank = false;
-        boolean lastAuthorIsNotBlank = false;
+        boolean flagSaveFile = false;
+
 
         if (author != null && !author.isBlank()) {
             System.out.println("Cleaning author " + author);
             summaryInfo.setAuthor("");
-            authorIsNotBlank = true;
+            flagSaveFile = true;
         } else {
             System.out.println("Author already clean");
         }
         if (lastAuthor != null && !lastAuthor.isBlank()) {
             System.out.println("Cleaning last author " + lastAuthor);
             summaryInfo.setLastAuthor("");
-            lastAuthorIsNotBlank = true;
+            flagSaveFile = true;
         } else {
             System.out.println("Last author already clean");
         }
-        if (authorIsNotBlank || lastAuthorIsNotBlank) {
+        if (flagSaveFile) {
             saveXLS(workbook, file);
         }
     }
@@ -77,5 +76,7 @@ public class ExcelAuthorRemover {
             throw new RuntimeException("Cannot save file", e);
         }
     }
-    //***       End_Logic - Process XLS documents Microsoft Office 1997-2004        ***
+    //***       Start_Logic - Process XLSX documents Microsoft Office 2005 to current        ***
+
+
 }
