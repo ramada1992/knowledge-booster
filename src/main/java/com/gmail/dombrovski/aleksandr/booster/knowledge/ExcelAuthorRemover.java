@@ -32,6 +32,8 @@ public class ExcelAuthorRemover {
         }
     }
 
+    //***       Start_Logic - Process XLS documents Microsoft Office 1997-2004        ***
+
     private static void processXLS(final File file) {
         final HSSFWorkbook workbook = readXLS(file);
         final SummaryInformation summaryInfo = workbook.getSummaryInformation();
@@ -75,4 +77,5 @@ public class ExcelAuthorRemover {
             throw new RuntimeException("Cannot save file", e);
         }
     }
+    //***       End_Logic - Process XLS documents Microsoft Office 1997-2004        ***
 }
