@@ -69,7 +69,7 @@ public class ExcelAuthorRemover {
                 System.out.println("Already clean");
             }
         } catch (final Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println(fullErrorMessage(e));
         }
     }
 
@@ -117,5 +117,21 @@ public class ExcelAuthorRemover {
 
     private static CoreProperties documentProperties(final Workbook document) {
         return ((XSSFWorkbook) document).getProperties().getCoreProperties();
+    }
+
+    private static String fullErrorMessage(final Throwable error) {
+        final StringBuilder message = new StringBuilder();
+        for (Throwable current = error; current != null; current = current.getCause()) {
+            if (message.length() > 0) {
+                message.append(": ");
+            }
+            message.append(current.getMessage());
+
+            if (current == current.getCause()) {
+                break;
+            }
+        }
+
+        return message.toString();
     }
 }
