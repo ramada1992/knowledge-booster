@@ -2,130 +2,120 @@ package com.gmail.dombrovski.aleksandr.booster.knowledge;
 
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ooxml.POIXMLProperties;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ooxml.POIXMLProperties.CoreProperties;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
-
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class ExcelAuthorRemover {
+    private static final Map<Class<? extends Workbook>, Function<Workbook, String>> GET_AUTHOR = Map.of(
+            HSSFWorkbook.class, (document) ->
+                    documentSummary(document).getAuthor(),
+            XSSFWorkbook.class, (document) ->
+                    documentProperties(document).getCreator());
+    private static final Map<Class<? extends Workbook>, BiConsumer<Workbook, String>> SET_AUTHOR = Map.of(
+            HSSFWorkbook.class, (document, author) ->
+                    documentSummary(document).setAuthor(author),
+            XSSFWorkbook.class, (document, author) ->
+                    documentProperties(document).setCreator(author));
+    private static final Map<Class<? extends Workbook>, Function<Workbook, String>> GET_LAST_AUTHOR = Map.of(
+            HSSFWorkbook.class, (document) ->
+                    documentSummary(document).getLastAuthor(),
+            XSSFWorkbook.class, (document) ->
+                    documentProperties(document).getLastModifiedByUser());
+    private static final Map<Class<? extends Workbook>, BiConsumer<Workbook, String>> SET_LAST_AUTHOR = Map.of(
+            HSSFWorkbook.class, (document, lastAuthor) ->
+                    documentSummary(document).setLastAuthor(lastAuthor),
+            XSSFWorkbook.class, (document, lastAuthor) ->
+                    documentProperties(document).setLastModifiedByUser(lastAuthor));
+
     public static void main(final String[] fileName) {
         Arrays.stream(fileName).forEach(ExcelAuthorRemover::removeAuthors);
     }
 
-    private static void removeAuthors(final String fileName) {
-        final File file = new File(fileName);
+    private static void removeAuthors(final String filename) {
+        System.out.println("Cleaning file " + filename);
 
-        System.out.println("Processing file " + file.getName());
-
-        if (!file.exists()) {
-            System.out.println("File doesn't exist");
-            return;
-        }
-        if (fileName.toLowerCase().endsWith(".xls")) {
-            processXLS(file);
-        }
-        if (fileName.toLowerCase().endsWith(".xlsx")) {
-            processXLSX(file);
-        } else {
-            System.out.println("Unsupported file type");
-        }
-    }
-
-    //***       Start_Logic - Process XLS documents Microsoft Office 1997-2004        ***
-
-    private static void processXLS(final File file) {
-        final HSSFWorkbook workbook = readXLS(file);
-        final SummaryInformation summaryInfo = workbook.getSummaryInformation();
-        final String author = summaryInfo.getAuthor();
-        final String lastAuthor = summaryInfo.getLastAuthor();
-
-        boolean flagSaveFile = false;
-
-        if (author != null && !author.isBlank()) {
-            System.out.println("Cleaning author " + author);
-            summaryInfo.setAuthor("");
-            flagSaveFile = true;
-        } else {
-            System.out.println("Author already clean");
-        }
-        if (lastAuthor != null && !lastAuthor.isBlank()) {
-            System.out.println("Cleaning last author " + lastAuthor);
-            summaryInfo.setLastAuthor("");
-            flagSaveFile = true;
-        } else {
-            System.out.println("Last author already clean");
-        }
-        if (flagSaveFile) {
-            saveXLS(workbook, file);
-        }
-    }
-
-    private static HSSFWorkbook readXLS(final File file) {
-        try (FileInputStream input = new FileInputStream(file)) {
-            return new HSSFWorkbook(new POIFSFileSystem(input));
-        } catch (final IOException e) {
-            throw new RuntimeException("Cannot read file", e);
-        }
-    }
-
-    private static void saveXLS(final HSSFWorkbook workbook, final File file) {
         try {
-            workbook.write(file);
+            final Workbook document = readDocument(filename);
+            final String author = getDocumentProperty(document, GET_AUTHOR);
+            final String lastAuthor = getDocumentProperty(document, GET_LAST_AUTHOR);
+
+            boolean removed = false;
+
+            if (author != null && !author.isBlank()) {
+                System.out.println("Cleaning author " + author);
+                cleanDocumentProperty(document, SET_AUTHOR);
+                removed = true;
+            }
+
+            if (lastAuthor != null && !lastAuthor.isBlank()) {
+                System.out.println("Cleaning last author " + lastAuthor);
+                cleanDocumentProperty(document, SET_LAST_AUTHOR);
+                removed = true;
+            }
+
+            if (removed) {
+                saveDocument(document, filename);
+            } else {
+                System.out.println("Already clean");
+            }
+        } catch (final Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static Workbook readDocument(final String filename) {
+        try (FileInputStream stream = new FileInputStream(filename)) {
+            return WorkbookFactory.create(stream);
         } catch (final IOException e) {
-            throw new RuntimeException("Cannot save file", e);
+            throw new RuntimeException("Cannot read Excel document", e);
         }
     }
 
-    //***       Start_Logic - Process XLSX documents Microsoft Office 2005 to current        ***
-
-    private static void processXLSX(final File file) {
-        final XSSFWorkbook workbook = readXLSX(file);
-        final POIXMLProperties props = workbook.getProperties();
-        final POIXMLProperties.CoreProperties coreProp = props.getCoreProperties();
-        final String author = coreProp.getCreator();
-        final String lastAuthor = coreProp.getLastModifiedByUser();
-
-        boolean flagSaveFile = false;
-
-        if (author != null && !author.isBlank()) {
-            System.out.println("Cleaning author " + author);
-            coreProp.setCreator("");
-            flagSaveFile = true;
-        } else {
-            System.out.println("Author already clean");
-        }
-        if (lastAuthor != null && !lastAuthor.isBlank()) {
-            System.out.println("Cleaning last author " + lastAuthor);
-            coreProp.setLastModifiedByUser("");
-            flagSaveFile = true;
-        } else {
-            System.out.println("Last author already clean");
-        }
-        if (flagSaveFile) {
-            saveXLSX(workbook, file);
-        }
-    }
-
-    private static XSSFWorkbook readXLSX(final File file) {
-        try (FileInputStream input = new FileInputStream(file)) {
-            return new XSSFWorkbook(input);
+    private static void saveDocument(final Workbook workbook, final String filename) {
+        try (FileOutputStream stream = new FileOutputStream(filename)) {
+            workbook.write(stream);
         } catch (final IOException e) {
-            throw new RuntimeException("Cannot read file", e);
+            throw new RuntimeException("Cannot save Excel document", e);
         }
     }
 
-    private static void saveXLSX(final XSSFWorkbook workbook, final File file) {
-        try (FileOutputStream output = new FileOutputStream(file)) {
-            workbook.write(output);
-        } catch (final IOException e) {
-            throw new RuntimeException("Cannot save file", e);
+    private static String getDocumentProperty(final Workbook document,
+                                              final Map<Class<? extends Workbook>,
+                                                      Function<Workbook, String>> getters) {
+        final Function<Workbook, String> getter = getters.get(document.getClass());
+        if (getter == null) {
+            throw new RuntimeException("Unsupported Excel document type: " + document.getClass());
         }
+
+        return getter.apply(document);
     }
 
+    private static void cleanDocumentProperty(final Workbook document,
+                                              final Map<Class<? extends Workbook>,
+                                                      BiConsumer<Workbook, String>> setters) {
+        final BiConsumer<Workbook, String> setter = setters.get(document.getClass());
+        if (setter == null) {
+            throw new RuntimeException("Unsupported Excel document type: " + document.getClass());
+        }
+
+        setter.accept(document, "");
+    }
+
+    private static SummaryInformation documentSummary(final Workbook document) {
+        return ((HSSFWorkbook) document).getSummaryInformation();
+    }
+
+    private static CoreProperties documentProperties(final Workbook document) {
+        return ((XSSFWorkbook) document).getProperties().getCoreProperties();
+    }
 }
