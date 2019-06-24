@@ -1,5 +1,6 @@
 package com.gmail.dombrovski.aleksandr.booster.knowledge;
 
+import org.apache.commons.math3.util.Pair;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ooxml.POIXMLProperties.CoreProperties;
@@ -14,6 +15,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ExcelAuthorRemover {
     private static final Map<Class<? extends Workbook>, Function<Workbook, String>> GET_AUTHOR = Map.of(
@@ -46,9 +49,14 @@ public class ExcelAuthorRemover {
 
         try {
             final Workbook document = readDocument(filename);
-            final String author = getDocumentProperty(document, GET_AUTHOR);
-            final String lastAuthor = getDocumentProperty(document, GET_LAST_AUTHOR);
+           // final String author = getDocumentProperty(document, GET_AUTHOR);
+            //final String lastAuthor = getDocumentProperty(document, GET_LAST_AUTHOR);
 
+            Stream.of(Pair.create("author", Pair.create(GET_AUTHOR, SET_AUTHOR)),
+                    Pair.create("lastAuthor", Pair.create(GET_LAST_AUTHOR, SET_LAST_AUTHOR)))
+
+                    .map(property -> cleanProperty(document, property.getKey(), property.getValue().getLeft().collect(Collectors.toList())));
+/*
             boolean removed = false;
 
             if (author != null && !author.isBlank()) {
@@ -68,9 +76,26 @@ public class ExcelAuthorRemover {
             } else {
                 System.out.println("Already clean");
             }
+            */
         } catch (final Exception e) {
             System.out.println(fullErrorMessage(e));
         }
+    }
+
+    private static boolean cleanProperty(final Workbook document,
+                                         final String name,
+                                         Function<Workbook, String> getter) {
+        final String property = getDocumentProperty(document, ????);
+
+        boolean removed = false;
+
+        if (property != null && !property.isBlank()) {
+            System.out.println("Cleaning " + name + " " + property);
+            cleanDocumentProperty(document, SET_AUTHOR);
+            removed = true;
+        }
+
+        return removed;
     }
 
     private static Workbook readDocument(final String filename) {
