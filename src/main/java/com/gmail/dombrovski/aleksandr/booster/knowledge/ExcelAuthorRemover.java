@@ -49,14 +49,16 @@ public class ExcelAuthorRemover {
 
         try {
             final Workbook document = readDocument(filename);
-           // final String author = getDocumentProperty(document, GET_AUTHOR);
-            //final String lastAuthor = getDocumentProperty(document, GET_LAST_AUTHOR);
-
-            Stream.of(Pair.create("author", Pair.create(GET_AUTHOR, SET_AUTHOR)),
+            System.out.println(Stream.of(
+                    Pair.create("author", Pair.create(GET_AUTHOR, SET_AUTHOR)),
                     Pair.create("lastAuthor", Pair.create(GET_LAST_AUTHOR, SET_LAST_AUTHOR)))
+                    .map(property -> cleanProperty(document, property.getKey(), property.getValue().getFirst()))
+                    .collect(Collectors.toList()));
 
-                    .map(property -> cleanProperty(document, property.getKey(), property.getValue().getLeft().collect(Collectors.toList())));
 /*
+            final String author = getDocumentProperty(document, GET_AUTHOR);
+            final String lastAuthor = getDocumentProperty(document, GET_LAST_AUTHOR);
+
             boolean removed = false;
 
             if (author != null && !author.isBlank()) {
@@ -76,7 +78,7 @@ public class ExcelAuthorRemover {
             } else {
                 System.out.println("Already clean");
             }
-            */
+*/
         } catch (final Exception e) {
             System.out.println(fullErrorMessage(e));
         }
@@ -84,18 +86,15 @@ public class ExcelAuthorRemover {
 
     private static boolean cleanProperty(final Workbook document,
                                          final String name,
-                                         Function<Workbook, String> getter) {
-        final String property = getDocumentProperty(document, ????);
-
-        boolean removed = false;
-
+                                         final Map<Class<? extends Workbook>, Function<Workbook, String>> getters) {
+        final String property = getDocumentProperty(document, getters);
         if (property != null && !property.isBlank()) {
             System.out.println("Cleaning " + name + " " + property);
-            cleanDocumentProperty(document, SET_AUTHOR);
-            removed = true;
+//            cleanDocumentProperty(document, SET_AUTHOR);
+            return true;
         }
 
-        return removed;
+        return false;
     }
 
     private static Workbook readDocument(final String filename) {
