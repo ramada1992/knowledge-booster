@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ExcelAuthorRemover {
@@ -49,36 +48,18 @@ public class ExcelAuthorRemover {
 
         try {
             final Workbook document = readDocument(filename);
-            System.out.println(Stream.of(
+            final boolean fileCleanup = Stream.of(
                     Pair.create("author", Pair.create(GET_AUTHOR, SET_AUTHOR)),
                     Pair.create("lastAuthor", Pair.create(GET_LAST_AUTHOR, SET_LAST_AUTHOR)))
-                    .map(property -> cleanProperty(document, property.getKey(), property.getValue().getFirst()))
-                    .collect(Collectors.toList()));
+                    .map(property -> cleanProperty(document, property.getKey(), property.getValue().getFirst(), property.getValue().getSecond()))
+                    .reduce(false, (a, b) -> a || b);
 
-/*
-            final String author = getDocumentProperty(document, GET_AUTHOR);
-            final String lastAuthor = getDocumentProperty(document, GET_LAST_AUTHOR);
-
-            boolean removed = false;
-
-            if (author != null && !author.isBlank()) {
-                System.out.println("Cleaning author " + author);
-                cleanDocumentProperty(document, SET_AUTHOR);
-                removed = true;
-            }
-
-            if (lastAuthor != null && !lastAuthor.isBlank()) {
-                System.out.println("Cleaning last author " + lastAuthor);
-                cleanDocumentProperty(document, SET_LAST_AUTHOR);
-                removed = true;
-            }
-
-            if (removed) {
+            if (fileCleanup) {
                 saveDocument(document, filename);
             } else {
                 System.out.println("Already clean");
             }
-*/
+
         } catch (final Exception e) {
             System.out.println(fullErrorMessage(e));
         }
@@ -86,11 +67,12 @@ public class ExcelAuthorRemover {
 
     private static boolean cleanProperty(final Workbook document,
                                          final String name,
-                                         final Map<Class<? extends Workbook>, Function<Workbook, String>> getters) {
+                                         final Map<Class<? extends Workbook>, Function<Workbook, String>> getters,
+                                         final Map<Class<? extends Workbook>, BiConsumer<Workbook, String>> setters) {
         final String property = getDocumentProperty(document, getters);
         if (property != null && !property.isBlank()) {
             System.out.println("Cleaning " + name + " " + property);
-//            cleanDocumentProperty(document, SET_AUTHOR);
+            cleanDocumentProperty(document, setters);
             return true;
         }
 
@@ -106,6 +88,7 @@ public class ExcelAuthorRemover {
     }
 
     private static void saveDocument(final Workbook workbook, final String filename) {
+
         try (FileOutputStream stream = new FileOutputStream(filename)) {
             workbook.write(stream);
         } catch (final IOException e) {
