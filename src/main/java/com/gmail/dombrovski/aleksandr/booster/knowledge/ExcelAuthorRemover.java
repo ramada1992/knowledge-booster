@@ -47,14 +47,15 @@ public class ExcelAuthorRemover {
         System.out.println("Cleaning file " + filename);
 
         try {
+
             final Workbook document = readDocument(filename);
-            final boolean fileCleanup = Stream.of(
+
+            if (Stream.of(
                     Pair.create("author", Pair.create(GET_AUTHOR, SET_AUTHOR)),
                     Pair.create("lastAuthor", Pair.create(GET_LAST_AUTHOR, SET_LAST_AUTHOR)))
-                    .map(property -> cleanProperty(document, property.getKey(), property.getValue().getFirst(), property.getValue().getSecond()))
-                    .reduce(false, (a, b) -> a || b);
-
-            if (fileCleanup) {
+                    .map(property -> cleanProperty(document, property.getKey(),
+                            property.getValue().getFirst(), property.getValue().getSecond()))
+                    .reduce(false, (a, b) -> a || b)) {
                 saveDocument(document, filename);
             } else {
                 System.out.println("Already clean");
@@ -71,11 +72,10 @@ public class ExcelAuthorRemover {
                                          final Map<Class<? extends Workbook>, BiConsumer<Workbook, String>> setters) {
         final String property = getDocumentProperty(document, getters);
         if (property != null && !property.isBlank()) {
-            System.out.println("Cleaning " + name + " " + property);
+            System.out.println("Cleaning " + name + ": " + property);
             cleanDocumentProperty(document, setters);
             return true;
         }
-
         return false;
     }
 
@@ -103,7 +103,6 @@ public class ExcelAuthorRemover {
         if (getter == null) {
             throw new RuntimeException("Unsupported Excel document type: " + document.getClass());
         }
-
         return getter.apply(document);
     }
 
@@ -138,7 +137,6 @@ public class ExcelAuthorRemover {
                 break;
             }
         }
-
         return message.toString();
     }
 }
