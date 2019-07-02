@@ -66,7 +66,7 @@ public class ExcelAuthorRemover {
             }
 
         } catch (final Exception e) {
-            LOGGER.info(fullErrorMessage(e));
+            LOGGER.error(fullErrorMessage(e));
         }
     }
 
@@ -92,7 +92,6 @@ public class ExcelAuthorRemover {
     }
 
     private static void saveDocument(final Workbook workbook, final String filename) {
-
         try (FileOutputStream stream = new FileOutputStream(filename)) {
             workbook.write(stream);
         } catch (final IOException e) {
