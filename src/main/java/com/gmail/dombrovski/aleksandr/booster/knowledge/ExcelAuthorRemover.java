@@ -7,6 +7,8 @@ import org.apache.poi.ooxml.POIXMLProperties.CoreProperties;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,6 +20,8 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class ExcelAuthorRemover {
+    private static final Logger logger = LoggerFactory.getLogger(ExcelAuthorRemover.class);
+
     private static final Map<Class<? extends Workbook>, Function<Workbook, String>> GET_AUTHOR = Map.of(
             HSSFWorkbook.class, (document) ->
                     documentSummary(document).getAuthor(),
@@ -44,7 +48,7 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String filename) {
-        System.out.println("Cleaning file " + filename);
+        logger.info("Cleaning file " + filename);
 
         try {
 
@@ -58,11 +62,11 @@ public class ExcelAuthorRemover {
                     .reduce(false, (a, b) -> a || b)) {
                 saveDocument(document, filename);
             } else {
-                System.out.println("Already clean");
+                logger.info("Already clean");
             }
 
         } catch (final Exception e) {
-            System.out.println(fullErrorMessage(e));
+            logger.info(fullErrorMessage(e));
         }
     }
 
@@ -72,7 +76,7 @@ public class ExcelAuthorRemover {
                                          final Map<Class<? extends Workbook>, BiConsumer<Workbook, String>> setters) {
         final String property = getDocumentProperty(document, getters);
         if (property != null && !property.isBlank()) {
-            System.out.println("Cleaning " + name + ": " + property);
+            logger.info("Cleaning " + name + ": " + property);
             cleanDocumentProperty(document, setters);
             return true;
         }
