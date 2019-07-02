@@ -20,7 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class ExcelAuthorRemover {
-    private static final Logger logger = LoggerFactory.getLogger(ExcelAuthorRemover.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExcelAuthorRemover.class);
 
     private static final Map<Class<? extends Workbook>, Function<Workbook, String>> GET_AUTHOR = Map.of(
             HSSFWorkbook.class, (document) ->
@@ -48,7 +48,7 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String filename) {
-        logger.info("Cleaning file " + filename);
+        LOGGER.info("Cleaning file " + filename);
 
         try {
 
@@ -62,11 +62,11 @@ public class ExcelAuthorRemover {
                     .reduce(false, (a, b) -> a || b)) {
                 saveDocument(document, filename);
             } else {
-                logger.info("Already clean");
+                LOGGER.info("Already clean");
             }
 
         } catch (final Exception e) {
-            logger.info(fullErrorMessage(e));
+            LOGGER.info(fullErrorMessage(e));
         }
     }
 
@@ -76,7 +76,7 @@ public class ExcelAuthorRemover {
                                          final Map<Class<? extends Workbook>, BiConsumer<Workbook, String>> setters) {
         final String property = getDocumentProperty(document, getters);
         if (property != null && !property.isBlank()) {
-            logger.info("Cleaning " + name + ": " + property);
+            LOGGER.info("Cleaning " + name + ": " + property);
             cleanDocumentProperty(document, setters);
             return true;
         }
