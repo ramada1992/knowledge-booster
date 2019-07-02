@@ -48,7 +48,7 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String filename) {
-        LOGGER.info("Cleaning file " + filename);
+        LOGGER.info("Cleaning file {}: ", filename);
 
         try {
 
@@ -76,7 +76,7 @@ public class ExcelAuthorRemover {
                                          final Map<Class<? extends Workbook>, BiConsumer<Workbook, String>> setters) {
         final String property = getDocumentProperty(document, getters);
         if (property != null && !property.isBlank()) {
-            LOGGER.info("Cleaning " + name + ": " + property);
+            LOGGER.info("Cleaning {}: {}", name, property);
             cleanDocumentProperty(document, setters);
             return true;
         }
