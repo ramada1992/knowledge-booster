@@ -48,9 +48,10 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String filename) {
-        LOGGER.info("Cleaning file {}", filename);
+        LOGGER.info("Cleaning file {}: ", filename);
 
         try {
+
             final Workbook document = readDocument(filename);
 
             if (Stream.of(
@@ -63,8 +64,9 @@ public class ExcelAuthorRemover {
             } else {
                 LOGGER.info("Already clean");
             }
+
         } catch (final Exception e) {
-            LOGGER.error("Cannot clean file {}", filename, e);
+            LOGGER.error(fullErrorMessage(e));
         }
     }
 
@@ -104,7 +106,6 @@ public class ExcelAuthorRemover {
         if (getter == null) {
             throw new RuntimeException("Unsupported Excel document type: " + document.getClass());
         }
-
         return getter.apply(document);
     }
 
@@ -125,5 +126,20 @@ public class ExcelAuthorRemover {
 
     private static CoreProperties documentProperties(final Workbook document) {
         return ((XSSFWorkbook) document).getProperties().getCoreProperties();
+    }
+
+    private static String fullErrorMessage(final Throwable error) {
+        final StringBuilder message = new StringBuilder();
+        for (Throwable current = error; current != null; current = current.getCause()) {
+            if (message.length() > 0) {
+                message.append(": ");
+            }
+            message.append(current.getMessage());
+
+            if (current == current.getCause()) {
+                break;
+            }
+        }
+        return message.toString();
     }
 }
