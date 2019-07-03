@@ -19,8 +19,6 @@
 
         <plugin.shade.version>3.2.1</plugin.shade.version>
 
-        <logback.version>1.2.3</logback.version>
-
     </properties>
 
     <dependencies>
@@ -41,13 +39,8 @@
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
+            <version>1.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
