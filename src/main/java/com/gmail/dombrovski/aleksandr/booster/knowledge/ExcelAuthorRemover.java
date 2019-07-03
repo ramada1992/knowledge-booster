@@ -49,7 +49,7 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String filename) {
-        LOGGER.info("Cleaning file {}: ", filename);
+        LOGGER.info("Cleaning file: {}", filename);
 
         try {
             final Workbook document = readDocument(filename);
@@ -64,7 +64,7 @@ public class ExcelAuthorRemover {
                 LOGGER.info("Already clean");
             }
         } catch (final Exception e) {
-            LOGGER.error("Cannot clean file {}", filename, e);
+            LOGGER.error("Cannot clean file: {}", filename, e);
         }
     }
 
