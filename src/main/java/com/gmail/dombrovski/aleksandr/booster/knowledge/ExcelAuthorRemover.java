@@ -1,5 +1,6 @@
 package com.gmail.dombrovski.aleksandr.booster.knowledge;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -72,7 +73,7 @@ public class ExcelAuthorRemover {
                                          final Map<Class<? extends Workbook>, Function<Workbook, String>> getters,
                                          final Map<Class<? extends Workbook>, BiConsumer<Workbook, String>> setters) {
         final String property = getDocumentProperty(document, getters);
-        if (property != null && !property.isBlank()) {
+        if (StringUtils.isNotBlank(property)) {
             LOGGER.info("Cleaning {}: {}", name, property);
             cleanDocumentProperty(document, setters);
             return true;

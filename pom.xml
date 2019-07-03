@@ -15,8 +15,9 @@
         <maven.compiler.target>${project.java.version}</maven.compiler.target>
         <project.build.sourceEncoding>${project.encoding}</project.build.sourceEncoding>
 
-        <apache.poi.version>4.1.0</apache.poi.version>
+        <commons.lang3.version>3.9</commons.lang3.version>
         <logback.version>1.2.3</logback.version>
+        <poi.version>4.1.0</poi.version>
         <slf4j.version>1.7.26</slf4j.version>
 
         <plugin.shade.version>3.2.1</plugin.shade.version>
@@ -30,14 +31,19 @@
                 <version>${logback.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
-                <version>${apache.poi.version}</version>
+                <version>${poi.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
-                <version>${apache.poi.version}</version>
+                <version>${poi.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -48,6 +54,10 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
