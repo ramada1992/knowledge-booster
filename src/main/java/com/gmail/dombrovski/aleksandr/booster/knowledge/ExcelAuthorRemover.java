@@ -128,4 +128,3 @@ public class ExcelAuthorRemover {
         return ((XSSFWorkbook) document).getProperties().getCoreProperties();
     }
 }
-
