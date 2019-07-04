@@ -1,6 +1,5 @@
 package com.gmail.dombrovski.aleksandr.booster.knowledge;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.util.Pair;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -49,10 +48,12 @@ public class ExcelAuthorRemover {
     }
 
     private static void removeAuthors(final String filename) {
-        LOGGER.info("Cleaning file: {}", filename);
+        LOGGER.info("Cleaning file {}: ", filename);
 
         try {
+
             final Workbook document = readDocument(filename);
+
             if (Stream.of(
                     Pair.create("author", Pair.create(GET_AUTHOR, SET_AUTHOR)),
                     Pair.create("lastAuthor", Pair.create(GET_LAST_AUTHOR, SET_LAST_AUTHOR)))
@@ -63,8 +64,9 @@ public class ExcelAuthorRemover {
             } else {
                 LOGGER.info("Already clean");
             }
+
         } catch (final Exception e) {
-            LOGGER.error("Cannot clean file: {}", filename, e);
+            LOGGER.error(fullErrorMessage(e));
         }
     }
 
@@ -73,12 +75,11 @@ public class ExcelAuthorRemover {
                                          final Map<Class<? extends Workbook>, Function<Workbook, String>> getters,
                                          final Map<Class<? extends Workbook>, BiConsumer<Workbook, String>> setters) {
         final String property = getDocumentProperty(document, getters);
-        if (StringUtils.isNotBlank(property)) {
+        if (property != null && !property.isBlank()) {
             LOGGER.info("Cleaning {}: {}", name, property);
             cleanDocumentProperty(document, setters);
             return true;
         }
-
         return false;
     }
 
@@ -105,7 +106,6 @@ public class ExcelAuthorRemover {
         if (getter == null) {
             throw new RuntimeException("Unsupported Excel document type: " + document.getClass());
         }
-
         return getter.apply(document);
     }
 
@@ -126,5 +126,20 @@ public class ExcelAuthorRemover {
 
     private static CoreProperties documentProperties(final Workbook document) {
         return ((XSSFWorkbook) document).getProperties().getCoreProperties();
+    }
+
+    private static String fullErrorMessage(final Throwable error) {
+        final StringBuilder message = new StringBuilder();
+        for (Throwable current = error; current != null; current = current.getCause()) {
+            if (message.length() > 0) {
+                message.append(": ");
+            }
+            message.append(current.getMessage());
+
+            if (current == current.getCause()) {
+                break;
+            }
+        }
+        return message.toString();
     }
 }
