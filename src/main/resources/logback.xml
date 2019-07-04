@@ -5,15 +5,20 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <appender name="DAY_BASED_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>ExcelAuthorRemover.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>ExcelAuthorRemover.%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+
         <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %C{36}:%L - %m%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS} %-5p %C{36}:%L - %m%n</pattern>
         </encoder>
     </appender>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="DAY_BASED_LOG" />
     </root>
 </configuration>
