@@ -10,6 +10,9 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,7 +23,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-public class ExcelAuthorRemover {
+@SpringBootApplication
+public class ExcelAuthorRemover implements CommandLineRunner {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelAuthorRemover.class);
 
     private static final Map<Class<? extends Workbook>, Function<Workbook, String>> GET_AUTHOR = Map.of(
@@ -44,8 +48,8 @@ public class ExcelAuthorRemover {
             XSSFWorkbook.class, (document, lastAuthor) ->
                     documentProperties(document).setLastModifiedByUser(lastAuthor));
 
-    public static void main(final String[] fileName) {
-        Arrays.stream(fileName).forEach(ExcelAuthorRemover::removeAuthors);
+    public static void main(final String... filenames) {
+        SpringApplication.run(ExcelAuthorRemover.class, filenames);
     }
 
     private static void removeAuthors(final String filename) {
@@ -126,5 +130,10 @@ public class ExcelAuthorRemover {
 
     private static CoreProperties documentProperties(final Workbook document) {
         return ((XSSFWorkbook) document).getProperties().getCoreProperties();
+    }
+
+    @Override
+    public void run(final String... filenames) {
+        Arrays.stream(filenames).forEach(ExcelAuthorRemover::removeAuthors);
     }
 }
